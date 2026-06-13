@@ -2,6 +2,21 @@
 
 ---
 
+
+## 공통 인증/인가 명세
+
+본 API는 JWT 기반 인증을 사용합니다.<br/>
+인증이 필요한 API 호출 시 HTTP Header에 아래와 같이 토큰을 포함해야 합니다.
+`Authorization: Bearer {Access_Token}`
+
+|코드| HTTP Stattus | 설명 |
+| :---| :---: | :--- |
+| UNAUTHORIZED | 401 | 토큰이 누락되었거나 만료됨 |
+|FORBIDDEN | 403 | 토큰은 유효하지만 해당 리소스에 대한 권한이 없음 |
+```
+
+---
+
 ## 공통 응답 구조
 
 모든 API 응답은 아래의 공통 구조를 따릅니다.
@@ -139,11 +154,14 @@
 
 ---
 
-## 3️⃣ 좌석 임시 배정 요청
+## 3️⃣ 좌석 임시 배정 요청  (인증 필요 🔒)
 
 * **Method:** POST
 
 * **URL:** `/concerts/{concertId}/reservations`
+
+* **Headers:**
+  * `Authorization: Bearer {Access_Token}`
 
 * **Path Parameters:**
 

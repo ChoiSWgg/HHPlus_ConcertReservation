@@ -10,22 +10,31 @@ spring:
       maximum-pool-size: 3
       connection-timeout: 10000
       max-lifetime: 60000
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    # [변경] 기본 드라이버 클래스를 MariaDB로 지정
+    driver-class-name: org.mariadb.jdbc.Driver
   jpa:
     open-in-view: false
     generate-ddl: false
     show-sql: false
     hibernate:
       ddl-auto: none
+    # [변경] 하이버네이트가 MariaDB 문법(Dialect)을 사용하도록 변경
+    database-platform: org.hibernate.dialect.MariaDBDialect
     properties:
       hibernate.timezone.default_storage: NORMALIZE_UTC
       hibernate.jdbc.time_zone: UTC
+springdoc:
+  swagger-ui:
+    # Swagger UI가 화면을 그릴 때 참조할 OpenAPI 스펙 파일 경로 지정
+    url: /openapi.yml
 
 ---
 spring.config.activate.on-profile: local, test
 
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/hhplus?characterEncoding=UTF-8&serverTimezone=UTC
+    # [변경] URL 프로토콜을 mariadb로 변경하고, 에러를 유발하던 옵션들을 마리아디비 규격에 맞게 정리
+    url: jdbc:mariadb://localhost:3306/hhplus?characterEncoding=UTF-8&serverTimezone=UTC&allowPublicKeyRetrieval=true&useSSL=false
+    driver-class-name: org.mariadb.jdbc.Driver
     username: application
     password: application
