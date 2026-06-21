@@ -1,10 +1,9 @@
 # 콘서트 예약 서비스 (Concert Reservation Service)
 
 ## 📌 아키텍처 문서 목록
-- [API 명세서](./api-specification.md)
-- [데이터 모델링 (ERD)](./erd.md)
-- [인프라 구조 설계](./infra_structure.md)
-- [의사결정 기록 (ADR 목록)](./adr/README.md)
+- [API 명세서](./docs/api-specification.md)
+- [데이터 모델링 (ERD)](./docs/erd.md)
+- [인프라 구조 설계](./docs/infra_structure.md)
 
 ## 🏛️ 주요 의사결정 (ADR 요약)
 1. **[ADR-001] 대기열 관리 방식 결정**: Redis Sorted Set vs RDBMS

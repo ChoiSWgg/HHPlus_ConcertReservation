@@ -13,7 +13,7 @@
 | :---| :---: | :--- |
 | UNAUTHORIZED | 401 | 토큰이 누락되었거나 만료됨 |
 |FORBIDDEN | 403 | 토큰은 유효하지만 해당 리소스에 대한 권한이 없음 |
-```
+
 
 ---
 
@@ -77,7 +77,7 @@
 
 * **Method:** GET
 
-* **URL:** `/concerts/{concertId}/dates`
+* **URL:** `/concerts/{concertId}/schedules`
 
 * **Path Parameters:**
 
@@ -91,7 +91,10 @@
 {
   "success": true,
   "data": {
-    "dates": ["2025-12-01", "2025-12-02", "2025-12-03"]
+    "schedules": [
+      { "schedule_id": 101, "date": "2025-12-01" },
+      { "schedule_id": 102, "date": "2025-12-02" }
+    ]
   }
 }
 ```
@@ -114,14 +117,13 @@
 
 * **Method:** GET
 
-* **URL:** `/concerts/{concertId}/dates/{date}/seats`
+* **URL:** `/concerts/{scheduleId}/seats`
 
 * **Path Parameters:**
 
-  | 이름 | 타입 | 필수 | 설명 |
-  |------|------|:--:|------|
-  | concertId | string | O  | 콘서트 고유 ID |
-  | date | string (YYYY-MM-DD) | O  | 조회할 날짜 |
+  | 이름 | 타입 | 필수 | 설명           |
+  |------|------|:--:|--------------|
+  | scheduleId | string | O  | 콘서트 일정 고유 ID |
 
 
 * **Response (ex. 200 OK):**
@@ -158,7 +160,7 @@
 
 * **Method:** POST
 
-* **URL:** `/concerts/{concertId}/reservations`
+* **URL:** `/concerts/{scheduleId}/reservations`
 
 * **Headers:**
   * `Authorization: Bearer {Access_Token}`
@@ -167,14 +169,13 @@
 
   | 이름 | 타입 | 필수 | 설명 |
   |------|------|:--:|------|
-  | concertId | string | O  | 콘서트 고유 ID |
+  | scheduleId | string | O  | 콘서트 고유 ID |
 
 * **Request Body:**
 
 ```json
 {
   "user_id": "user_123",
-  "date": "2025-12-22",
   "seat_number": 10
 }
 ```
@@ -315,14 +316,6 @@
   |------|------|:--:|------|
   | reservationId | string | O  | 예약 ID |
 
-* **Request Body:**
-
-```json
-{
-  "amount": 90000
-}
-```
-
 * **Response (201 Created):**
 
 ```json
@@ -384,8 +377,9 @@
 {
   "success": true,
   "data": {
-    "user_id": "user_123",
-    "waiting_order": 33
+    "queue_token": "jwt_token_string",
+    "status": "WAIT",
+    "waiting_order": 1234
   }
 }
 ```
@@ -408,21 +402,34 @@
 
 * **URL:** `/queues/{userId}`
 
+* **Headers:**
+    * `Authorization: Bearer {Access_Token}`
+
 * **Path Parameters:**
 
   | 이름 | 타입 | 필수 | 설명 |
   |------|------|:----:|------|
   | userId | string | ✅ | 사용자 ID |
 
-* **Response (200 OK):**
-
+* **Response (200 OK): 아직 대기 중일 때**
 ```json
-{
-  "success": true,
-  "data": {
-    "user_id": "user_123",
-    "waiting_order": 33
+{ "success": true, 
+  "data": 
+  { 
+    "status": "WAIT", 
+    "waiting_order": 142
   }
+}
+```
+* **Response (200 OK): 활성화 상태로 진입했을 때 (이제 예약 가능)**
+```
+{ 
+    "success": true, 
+    "data": 
+    { 
+        "status": "ACTIVE",
+        "waiting_order": 0 
+    } 
 }
 ```
 
