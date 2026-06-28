@@ -66,7 +66,7 @@
 | INVALID_PARAMETER     |     400     | 잘못된 파라미터           |
 | MISSING_PARAMETER     |     400     | 필수 파라미터 누락         |
 | UNAUTHORIZED          |     401     | 인증 실패 (로그인 필요)     |
-| FORBIDDEN             |     403     | 계정에 권한 없음          |
+| FORBIDDEN             |     403     | 해당 리소스에 권한 없음      |
 | NOT_FOUND             |     404     | 리소스를 찾을 수 없음       |
 | CONFLICT              |     409     | 리소스 충돌             |
 | GONE                  |     410     | 리소스가 있었으나 사라짐 (만료) |
