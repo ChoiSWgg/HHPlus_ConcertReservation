@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.domain.reservation.application;
+package kr.hhplus.be.server.domain.payment.application;
 
 import org.springframework.stereotype.Service;
 

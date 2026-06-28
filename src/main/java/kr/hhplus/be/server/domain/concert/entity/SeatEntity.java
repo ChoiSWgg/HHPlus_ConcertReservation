@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.domain.concert.infrastructure.persistence;
+package kr.hhplus.be.server.domain.concert.entity;
 
 import jakarta.persistence.*;
 import kr.hhplus.be.server.global.entity.BaseEntity;

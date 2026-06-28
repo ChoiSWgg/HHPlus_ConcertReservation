@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.domain.reservation.domain.model;
+package kr.hhplus.be.server.domain.payment.domain.model;
 
 public class Payment {
     private Long id;

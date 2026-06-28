@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.domain.reservation.infrastructure.persistence;
+package kr.hhplus.be.server.domain.payment.infrastructure.persistence;
 
 import jakarta.persistence.*;
 import kr.hhplus.be.server.global.entity.BaseEntity;
