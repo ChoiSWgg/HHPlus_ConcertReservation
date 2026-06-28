@@ -10,31 +10,51 @@ spring:
       maximum-pool-size: 3
       connection-timeout: 10000
       max-lifetime: 60000
-    # [변경] 기본 드라이버 클래스를 MariaDB로 지정
-    driver-class-name: org.mariadb.jdbc.Driver
+    driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     open-in-view: false
     generate-ddl: false
     show-sql: false
     hibernate:
       ddl-auto: none
-    # [변경] 하이버네이트가 MariaDB 문법(Dialect)을 사용하도록 변경
-    database-platform: org.hibernate.dialect.MariaDBDialect
+    database-platform: org.hibernate.dialect.MySQLDialect
     properties:
       hibernate.timezone.default_storage: NORMALIZE_UTC
       hibernate.jdbc.time_zone: UTC
+
 springdoc:
   swagger-ui:
     # Swagger UI가 화면을 그릴 때 참조할 OpenAPI 스펙 파일 경로 지정
     url: /openapi.yml
 
----
-spring.config.activate.on-profile: local, test
+# JWT 토큰 설정 추가 (임의의 256비트 대칭키)
+jwt:
+  secret: dGhpcy1pcy1hLXNlY3VyZS1hbmQtc3VmaWNpZW50bHktbG9uZy1zZWNyZXQta2V5LWZvci10ZXN0aW5nLTI1Ni1iaXQ=
+  expiration: 86400000 # 24시간 (단위: ms)
 
+---
 spring:
+  config:
+    activate:
+      on-profile: local, test
+
   datasource:
     # [변경] URL 프로토콜을 mariadb로 변경하고, 에러를 유발하던 옵션들을 마리아디비 규격에 맞게 정리
-    url: jdbc:mariadb://localhost:3306/hhplus?characterEncoding=UTF-8&serverTimezone=UTC&allowPublicKeyRetrieval=true&useSSL=false
-    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/hhplus?characterEncoding=UTF-8&serverTimezone=UTC&allowPublicKeyRetrieval=true&useSSL=false
+    driver-class-name: com.mysql.cj.jdbc.Driver
     username: application
     password: application
+
+  # 로컬/테스트 환경용 Redis 연결 정보 추가
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+  # 개발 편의를 위해 local, test 프로필에만 SQL 포맷 로깅 활성화 (운영 설정에 영향 없음)
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
