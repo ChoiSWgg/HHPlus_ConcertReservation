@@ -8,11 +8,11 @@ servers:
     description: 로컬 개발 서버
 
 paths:
-  # 1. 예약 가능 날짜 조회
-  /concerts/{concertId}/dates:
+  # 1. 특정 콘서트의 회차(일정) 목록 조회
+  /concerts/{concertId}/schedules:
     get:
-      summary: 예약 가능 날짜 조회
-      description: 특정 콘서트의 예약 가능한 날짜 목록을 조회합니다.
+      summary: 예약 가능 날짜(회차) 조회
+      description: 특정 콘서트의 예약 가능한 일정 및 회차 목록을 조회합니다.
       parameters:
         - name: concertId
           in: path
@@ -33,34 +33,25 @@ paths:
                       data:
                         type: object
                         properties:
-                          dates:
+                          schedules:
                             type: array
                             items:
-                              type: string
-                              format: date
-                            example: ["2025-12-01", "2025-12-02", "2025-12-03"]
-        '404':
-          $ref: '#/components/responses/NotFoundError'
+                              $ref: '#/components/schemas/ScheduleInfo'
 
-  # 2. 특정 날짜 좌석 조회
-  /concerts/{concertId}/dates/{date}/seats:
+  # 2. 특정 회차의 좌석 조회 (concertId/date 조합 대신 scheduleId 단일 식별자 사용)
+  /schedules/{scheduleId}/seats:
     get:
-      summary: 특정 날짜 좌석 조회
-      description: 특정 콘서트 및 날짜의 좌석 예약 현황을 조회합니다.
+      summary: 특정 회차 좌석 조회
+      description: 특정 콘서트 회차(Schedule)의 좌석 예약 현황을 조회합니다. (대기열 통과자 전용)
+      security:
+        - QueueTokenAuth: []
       parameters:
-        - name: concertId
+        - name: scheduleId
           in: path
           required: true
           schema:
             type: string
-          description: 콘서트 고유 ID
-        - name: date
-          in: path
-          required: true
-          schema:
-            type: string
-            format: date
-          description: 조회할 날짜 (YYYY-MM-DD)
+          description: 콘서트 스케줄(회차) 고유 ID
       responses:
         '200':
           description: 성공 응답
@@ -74,10 +65,9 @@ paths:
                       data:
                         type: object
                         properties:
-                          date:
+                          schedule_id:
                             type: string
-                            format: date
-                            example: "2025-12-01"
+                            example: "schedule_456"
                           seats:
                             type: array
                             items:
@@ -85,20 +75,20 @@ paths:
         '404':
           $ref: '#/components/responses/NotFoundError'
 
-  # 3. 좌석 임시 배정 요청
-  /concerts/{concertId}/reservations:
+  # 3. 좌석 임시 배정 요청 (scheduleId 구조 반영 및 전용 헤더 인증 적용)
+  /schedules/{scheduleId}/reservations:
     post:
       summary: 좌석 임시 배정 요청
-      description: 특정 좌석을 5분간 임시 점유(held)합니다. (인증 필요)
+      description: 특정 회차의 좌석을 5분간 임시 점유(HELD)합니다. (대기열 토큰 필수)
       security:
-        - BearerAuth: []
+        - QueueTokenAuth: []
       parameters:
-        - name: concertId
+        - name: scheduleId
           in: path
           required: true
           schema:
             type: string
-          description: 콘서트 고유 ID
+          description: 콘서트 스케줄(회차) 고유 ID
       requestBody:
         required: true
         content:
@@ -107,19 +97,14 @@ paths:
               type: object
               required:
                 - user_id
-                - date
-                - seat_number
+                - seat_id
               properties:
                 user_id:
                   type: string
                   example: "user_123"
-                date:
+                seat_id:
                   type: string
-                  format: date
-                  example: "2025-12-22"
-                seat_number:
-                  type: integer
-                  example: 10
+                  example: "seat_10"
       responses:
         '201':
           description: 임시 배정 완료
@@ -138,19 +123,17 @@ paths:
                             example: "reservation_7654"
                           status:
                             type: string
-                            enum: [held]
-                            example: "held"
-                          date:
+                            example: "HELD"
+                          schedule_id:
                             type: string
-                            format: date
-                            example: "2025-12-22"
-                          seat_number:
-                            type: integer
-                            example: 10
+                            example: "schedule_456"
+                          seat_id:
+                            type: string
+                            example: "seat_10"
                           hold_expire_time:
                             type: string
                             format: date-time
-                            example: "2025-12-01T09:05:00Z"
+                            example: "2026-12-01T09:05:00Z"
         '400':
           $ref: '#/components/responses/BadRequestError'
         '409':
@@ -160,9 +143,7 @@ paths:
   /users/{userId}/points:
     get:
       summary: 포인트 조회
-      description: 사용자의 현재 포인트 잔액을 조회합니다. (인증 필요)
-      security:
-        - BearerAuth: []
+      description: 사용자의 현재 포인트 잔액을 조회합니다.
       parameters:
         - name: userId
           in: path
@@ -189,9 +170,7 @@ paths:
           $ref: '#/components/responses/NotFoundError'
     patch:
       summary: 포인트 충전
-      description: 사용자의 지갑에 포인트를 충전합니다. (인증 필요)
-      security:
-        - BearerAuth: []
+      description: 사용자의 지갑에 포인트를 충전합니다.
       parameters:
         - name: userId
           in: path
@@ -237,9 +216,9 @@ paths:
   /reservations/{reservationId}/payments:
     post:
       summary: 결제 요청
-      description: 임시 배정된 좌석에 대한 결제를 진행하고 예약을 확정합니다. (인증 필요)
+      description: 임시 배정된 좌석에 대한 결제를 진행하고 예약을 확정합니다. (대기열 토큰 필수)
       security:
-        - BearerAuth: []
+        - QueueTokenAuth: []
       parameters:
         - name: reservationId
           in: path
@@ -279,8 +258,7 @@ paths:
                             example: 90000
                           status:
                             type: string
-                            enum: [completed]
-                            example: "completed"
+                            example: "CONFIRMED"
         '400':
           $ref: '#/components/responses/BadRequestError'
         '410':
@@ -290,7 +268,7 @@ paths:
   /queues:
     post:
       summary: 대기열 토큰 발급
-      description: 대기열 진입을 위한 토큰을 발급받습니다.
+      description: 대기열 진입을 위한 고유 토큰을 발급받습니다.
       requestBody:
         required: true
         content:
@@ -321,7 +299,7 @@ paths:
   /queues/{userId}:
     get:
       summary: 대기번호 조회
-      description: 사용자의 현재 대기열 순번을 확인합니다.
+      description: 사용자의 현재 대기열 순번 및 상태를 확인합니다.
       parameters:
         - name: userId
           in: path
@@ -344,18 +322,16 @@ paths:
           $ref: '#/components/responses/NotFoundError'
 
 components:
-  # 인증 방식 정의
+  # 인증 방식 정의 (대기열 통과 검증용 헤더 스펙 명시)
   securitySchemes:
-    BearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
-      # [교정 파트] 큰따옴표 내부에 콜론(:) 문자가 들어와 오작동하던 설정을 안전한 단일 문자열로 변경
-      description: JWT 인증 헤더 - Authorization 헤더에 Bearer 토큰을 넣어주세요.
+    QueueTokenAuth:
+      type: apiKey
+      in: header
+      name: Queue-Token
+      description: 대기열 진입 시 발급받은 UUID 형태의 토큰 문자열입니다.
 
   # 데이터 공통 규격 정의
   schemas:
-    # 공통 성공 규격 (Envelope Pattern)
     SuccessEnvelope:
       type: object
       required:
@@ -365,7 +341,6 @@ components:
           type: boolean
           example: true
 
-    # 공통 에러 규격
     ErrorResponse:
       type: object
       required:
@@ -388,11 +363,34 @@ components:
               type: string
               example: "에러 상세 메시지 설명"
 
-    # 좌석 정보 객체
+    # 스케줄 정보 객체
+    ScheduleInfo:
+      type: object
+      properties:
+        schedule_id:
+          type: string
+          example: "schedule_456"
+        date:
+          type: string
+          format: date-time
+          example: "2026-12-22T19:30:00Z"
+        reservation_open_time:
+          type: string
+          format: date-time
+          example: "2026-12-01T09:00:00Z"
+        reservation_close_time:
+          type: string
+          format: date-time
+          example: "2026-12-22T18:00:00Z"
+
+    # 좌석 정보 객체 (ERD 매핑에 맞춰 식별자 구조 동기화)
     SeatInfo:
       type: object
       properties:
-        seat_number:
+        seat_id:
+          type: string
+          example: "seat_1"
+        seat_no:
           type: integer
           example: 1
         status:
@@ -407,11 +405,17 @@ components:
         user_id:
           type: string
           example: "user_123"
+        token:
+          type: string
+          example: "abc1234-uuid-token-string"
+        status:
+          type: string
+          enum: [WAIT, ACTIVE]
+          example: "WAIT"
         waiting_order:
           type: integer
           example: 33
 
-  # 공통 에러 응답 재사용 정의
   responses:
     BadRequestError:
       description: 잘못된 요청 파라미터 또는 충전/결제 유효성 검사 실패
