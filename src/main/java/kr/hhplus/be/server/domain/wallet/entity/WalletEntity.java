@@ -17,4 +17,14 @@ public class WalletEntity extends BaseEntity {
 
     @Column(nullable = false)
     private Long balance;
+
+    // 포인트 충전
+    public void charge(Long amount) {
+        this.balance += amount;
+    }
+
+    // 포인트 차감
+    public void deduct(Long amount) {
+        this.balance -= amount;
+    }
 }

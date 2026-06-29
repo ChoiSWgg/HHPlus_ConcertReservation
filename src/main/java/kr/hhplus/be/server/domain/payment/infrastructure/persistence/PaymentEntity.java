@@ -1,6 +1,7 @@
 package kr.hhplus.be.server.domain.payment.infrastructure.persistence;
 
 import jakarta.persistence.*;
+import kr.hhplus.be.server.domain.payment.domain.model.Payment;
 import kr.hhplus.be.server.global.entity.BaseEntity;
 import lombok.Getter;
 
@@ -16,10 +17,23 @@ public class PaymentEntity extends BaseEntity {
     private Long id;
 
     @Column(nullable = false)
-    private Long reservationsId;
+    private Long reservationId;
 
     @Column(nullable = false)
-    private Integer price;
+    private Long price;
 
     private LocalDateTime paidAt;
+
+    public static PaymentEntity from(Payment payment) {
+        PaymentEntity paymentEntity = new PaymentEntity();
+        paymentEntity.id = payment.getId();
+        paymentEntity.reservationId = payment.getReservationId();
+        paymentEntity.price = payment.getPrice();
+        paymentEntity.paidAt = payment.getPaidAt();
+        return paymentEntity;
+    }
+
+    public Payment toDomain() {
+        return Payment.reconstruct(id, reservationId, price, paidAt);
+    }
 }
