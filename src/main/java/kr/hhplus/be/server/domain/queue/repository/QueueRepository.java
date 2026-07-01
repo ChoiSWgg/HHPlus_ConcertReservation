@@ -1,6 +1,6 @@
 package kr.hhplus.be.server.domain.queue.repository;
 
-// Queue는 Redis 기반이므로, Redis 연산을 추상화한 메서드들을 정의한다.
+// 대기열(queue)는 Redis 기반이므로, Redis 연산을 추상화한 메서드들을 정의한다.
 public interface QueueRepository {
 
     // 유저가 이미 대기열에 있는지 확인
