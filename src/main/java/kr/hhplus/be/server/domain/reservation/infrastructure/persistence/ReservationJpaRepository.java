@@ -1,25 +1,15 @@
 package kr.hhplus.be.server.domain.reservation.infrastructure.persistence;
 
-import kr.hhplus.be.server.domain.reservation.domain.model.Reservation;
-import kr.hhplus.be.server.domain.reservation.domain.repository.ReservationRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
 import java.util.Optional;
 
-@Repository
-public class ReservationJpaRepository implements ReservationRepository {
-    private final SpringReservationJpa springReservationJpa;
+public interface ReservationJpaRepository extends JpaRepository<ReservationEntity, Long> {
 
-    public ReservationJpaRepository(SpringReservationJpa springReservationJpa) {
-        this.springReservationJpa = springReservationJpa;
-    }
+    // 특정 스케줄 + 좌석 조합으로 조회
+    Optional<ReservationEntity> findByScheduleIdAndSeatId(Long scheduleId, Long seatId);
 
-    @Override
-    public Optional<Reservation> findByScheduleAndSeat(Long scheduleId, Long seatId) {
-        return Optional.empty();
-    }
-
-    @Override
-    public Reservation save(Reservation reservation) {
-        return reservation;
-    }
+    // 특정 스케줄의 전체 예약 목록 조회
+    List<ReservationEntity> findAllByScheduleId(Long scheduleId);
 }

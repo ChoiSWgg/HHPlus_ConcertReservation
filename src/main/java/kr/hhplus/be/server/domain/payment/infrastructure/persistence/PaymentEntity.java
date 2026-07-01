@@ -24,6 +24,7 @@ public class PaymentEntity extends BaseEntity {
 
     private LocalDateTime paidAt;
 
+    // Domain -> Entity
     public static PaymentEntity from(Payment payment) {
         PaymentEntity paymentEntity = new PaymentEntity();
         paymentEntity.id = payment.getId();
@@ -33,6 +34,7 @@ public class PaymentEntity extends BaseEntity {
         return paymentEntity;
     }
 
+    // Entity -> Domain
     public Payment toDomain() {
         return Payment.reconstruct(id, reservationId, price, paidAt);
     }
