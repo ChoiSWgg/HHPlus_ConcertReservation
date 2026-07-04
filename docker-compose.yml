@@ -12,6 +12,14 @@ services:
     volumes:
       - ./data/mysql/:/var/lib/mysql
 
+  # 로컬 개발용 Redis
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./data/redis/:/data
+
 networks:
   default:
     driver: bridge
