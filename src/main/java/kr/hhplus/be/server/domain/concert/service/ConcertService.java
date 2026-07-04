@@ -61,7 +61,7 @@ public class ConcertService {
      *    - 그 외 (만료된 HELD 등) → "available"
      * 5. SeatStatusResponse 리스트로 반환
      */
-    public List<SeatStatusResponse> getSeats(Long scheduleId) {
+    public List<SeatStatusResponse> getSeatStatuses(Long scheduleId) {
         ConcertScheduleEntity concertSchedules = concertScheduleRepository.findById(scheduleId)
             .orElseThrow(() -> new CustomException(ErrorCode.CONCERT_SCHEDULE_NOT_FOUND));
 
