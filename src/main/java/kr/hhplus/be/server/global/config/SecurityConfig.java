@@ -40,9 +40,11 @@ public class SecurityConfig {
 
             .authorizeHttpRequests(auth -> auth
                 // 대기열 등록, Swagger UI, H2 콘솔 접근은 무조건 허용
-                .requestMatchers("/queues/**", "/h2-console/**", "/swagger-ui/**", "/v3/api-docs/**", "/openapi.yml").permitAll()
+                .requestMatchers("/queues/**", "/h2-console/**", "/swagger-ui/**", "/v3/api-docs/**", "/openapi.yml")
+                    .permitAll()
                 // 그 외 모든 비즈니스 API(예약, 결제, 포인트 관리 등)는 JWT 인증 필수
-                .anyRequest().authenticated()
+                //.anyRequest().authenticated()
+                .anyRequest().permitAll()
             )
 
             // JWT 인증 필터를 UsernamePasswordAuthenticationFilter 전에 끼워 넣음
