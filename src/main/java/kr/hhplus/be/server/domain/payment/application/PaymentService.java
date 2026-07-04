@@ -55,12 +55,11 @@ public class PaymentService {
         walletRepository.save(wallet);
         // 결제 이력 저장
         Payment payment = Payment.of(reservationId, amount);
-        paymentRepository.save(payment);
         Payment savedPayment = paymentRepository.save(payment);
 
         // 예약 확정
         reservation.confirm();
-        Reservation savedReservation = reservationRepository.save(reservation);
+        reservationRepository.save(reservation);
         return new PaymentResponse(savedPayment.getId(), amount, "CONFIRMED");
     }
 }

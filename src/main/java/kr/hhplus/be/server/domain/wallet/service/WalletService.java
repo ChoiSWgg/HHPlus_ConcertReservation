@@ -2,7 +2,6 @@ package kr.hhplus.be.server.domain.wallet.service;
 
 import kr.hhplus.be.server.domain.user.dto.ChargeResponse;
 import kr.hhplus.be.server.domain.user.dto.PointResponse;
-import kr.hhplus.be.server.domain.user.entity.UserEntity;
 import kr.hhplus.be.server.domain.user.repository.UserRepository;
 import kr.hhplus.be.server.domain.wallet.entity.WalletEntity;
 import kr.hhplus.be.server.domain.wallet.repository.WalletRepository;
@@ -31,7 +30,7 @@ public class WalletService {
      * 3. PointResponse(userId, wallet.getBalance()) 반환
      */
     public PointResponse getBalance(Long userId) {
-        UserEntity userEntity = userRepository.findById(userId)
+        userRepository.findById(userId)
             .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         WalletEntity walletEntity = walletRepository.findByUserId(userId)
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND));
@@ -53,7 +52,7 @@ public class WalletService {
     public ChargeResponse charge(Long userId, Long amount) {
         if (amount <= 0) throw new CustomException(ErrorCode.INVALID_AMOUNT);
 
-        UserEntity userEntity = userRepository.findById(userId)
+        userRepository.findById(userId)
             .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         WalletEntity walletEntity = walletRepository.findByUserId(userId)
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND));

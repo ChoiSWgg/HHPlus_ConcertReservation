@@ -41,9 +41,8 @@ public class QueueService {
         if (queueRepository.isUserInQueue(userId))
             throw new CustomException(ErrorCode.ALREADY_IN_QUEUE);
         String token = UUID.randomUUID().toString();
-        queueRepository.storeToken(userId, token);
-
         Long rank = queueRepository.addToQueue(userId);
+        queueRepository.storeToken(userId, token);
         String status = rank < ACTIVE_THRESHOLD ? "ACTIVE" : "WAIT";
         return new QueueTokenResponse(userId, token, status, rank + 1);
     }
@@ -62,6 +61,7 @@ public class QueueService {
         if (!queueRepository.isUserInQueue(userId))
             throw new CustomException(ErrorCode.USER_NOT_IN_QUEUE);
         Long rank = queueRepository.getRank(userId);
+        if (rank == null) throw new CustomException(ErrorCode.USER_NOT_IN_QUEUE);
         String token = queueRepository.getToken(userId);
         String status = rank < ACTIVE_THRESHOLD ? "ACTIVE" : "WAIT";
         return new QueueTokenResponse(userId, token, status, rank+1); // 1-based rank

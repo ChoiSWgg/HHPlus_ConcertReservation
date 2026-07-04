@@ -67,10 +67,13 @@ public class ConcertService {
 
         List<SeatEntity> seats = seatRepository.findAll();
 
-        Map<Long, Reservation> reservationMap =
-            reservationRepository.findAllByScheduleId(scheduleId)
+        Map<Long, Reservation> reservationMap = reservationRepository.findAllByScheduleId(scheduleId)
             .stream()
-            .collect(Collectors.toMap(Reservation::getSeatId, r -> r));
+            .collect(Collectors.toMap(
+                Reservation::getSeatId,
+                r -> r,
+                (existing, replacement) -> existing //merge function
+            ));
 
         return seats.stream()
             .map(seat -> {

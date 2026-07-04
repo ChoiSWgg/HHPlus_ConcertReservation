@@ -1,8 +1,12 @@
 package kr.hhplus.be.server.domain.queue.repository;
 
+import kr.hhplus.be.server.global.exception.CustomException;
+import kr.hhplus.be.server.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -36,8 +40,10 @@ public class QueueRedisRepository implements QueueRepository {
 
     @Override
     public String getToken(Long userId) {
-        return redisTemplate.opsForValue().get(TOKEN_KEY_PREFIX + userId);
+        return Optional.ofNullable(redisTemplate.opsForValue().get(TOKEN_KEY_PREFIX + userId))
+            .orElseThrow(() -> new CustomException(ErrorCode.TOKEN_NOT_FOUND));
     }
+
 
     @Override
     public void storeToken(Long userId, String token) {

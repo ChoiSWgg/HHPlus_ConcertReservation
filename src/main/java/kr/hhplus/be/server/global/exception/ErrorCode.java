@@ -42,7 +42,7 @@ public enum ErrorCode {
 
     // 4 사용자 포인트 관리 관련
     INVALID_AMOUNT(HttpStatus.BAD_REQUEST, "INVALID_AMOUNT", "충전 금액은 0보다 커야 합니다."),
-    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "NOT_FOUND", "해당 사용자를 찾을 수 없습니다."),
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER_NOT_FOUND", "해당 사용자를 찾을 수 없습니다."),
 
     // 5 결제 관련
     INSUFFICIENT_POINTS(HttpStatus.BAD_REQUEST, "INSUFFICIENT_POINTS", "포인트가 부족합니다."),
@@ -50,8 +50,8 @@ public enum ErrorCode {
 
     // 6 유저 대기열 관련
     ALREADY_IN_QUEUE(HttpStatus.CONFLICT, "ALREADY_IN_QUEUE", "이미 대기열에 등록된 사용자입니다."),
-    USER_NOT_IN_QUEUE(HttpStatus.NOT_FOUND, "USER_NOT_IN_QUEUE", "대기열에 등록되지 않은 사용자입니다.");
-
+    USER_NOT_IN_QUEUE(HttpStatus.NOT_FOUND, "USER_NOT_IN_QUEUE", "대기열에 등록되지 않은 사용자입니다."),
+    TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, "TOKEN_NOT_FOUND", "해당 사용자의 토큰을 찾을 수 없거나 만료되었습니다.");
 
     private final HttpStatus status;
     private final String code;
