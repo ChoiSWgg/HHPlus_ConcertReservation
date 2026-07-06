@@ -3,11 +3,14 @@ package kr.hhplus.be.server.domain.reservation.infrastructure.persistence;
 import jakarta.persistence.*;
 import kr.hhplus.be.server.domain.reservation.domain.model.Reservation;
 import kr.hhplus.be.server.global.entity.BaseEntity;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "reservations",
         uniqueConstraints = @UniqueConstraint(

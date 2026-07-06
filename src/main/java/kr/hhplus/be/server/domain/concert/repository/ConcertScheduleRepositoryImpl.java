@@ -9,7 +9,7 @@ import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
-public class ConcertScheduleJpaRepositoryImpl implements ConcertScheduleRepository{
+public class ConcertScheduleRepositoryImpl implements ConcertScheduleRepository{
 
     private final ConcertScheduleJpaRepository concertScheduleJpaRepository;
 

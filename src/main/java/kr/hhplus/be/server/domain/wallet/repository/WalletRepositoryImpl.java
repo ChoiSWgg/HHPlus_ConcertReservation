@@ -8,7 +8,7 @@ import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
-public class WalletJpaRepositoryImpl implements WalletRepository {
+public class WalletRepositoryImpl implements WalletRepository {
 
     private final WalletJpaRepository walletJpaRepository;
 

@@ -45,6 +45,7 @@ public class PaymentService {
     public PaymentResponse processPayment(Long reservationId, Long amount) {
         Reservation reservation = reservationRepository.findById(reservationId)
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND));
+
         if (reservation.isExpired()) throw new CustomException(ErrorCode.RESERVATION_EXPIRED);
 
         WalletEntity wallet = walletRepository.findByUserId(reservation.getUserId())

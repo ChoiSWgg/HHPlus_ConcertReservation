@@ -49,4 +49,11 @@ public class QueueRedisRepository implements QueueRepository {
     public void storeToken(Long userId, String token) {
         redisTemplate.opsForValue().set(TOKEN_KEY_PREFIX + userId, token);
     }
+
+    @Override
+    public void removeFromQueue(Long userId) {
+        // ZSET에서 해당 userId를 제거
+        redisTemplate.opsForZSet().remove(WAITING_KEY, userId.toString());
+
+    }
 }

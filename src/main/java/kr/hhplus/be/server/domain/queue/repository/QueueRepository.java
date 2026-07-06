@@ -17,4 +17,7 @@ public interface QueueRepository {
 
     // 토큰 저장
     void storeToken(Long userId, String token);
+
+    // 대기열에서 제거
+    void removeFromQueue(Long userId);
 }

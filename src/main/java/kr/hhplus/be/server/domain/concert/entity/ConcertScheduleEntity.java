@@ -2,11 +2,12 @@ package kr.hhplus.be.server.domain.concert.entity;
 
 import jakarta.persistence.*;
 import kr.hhplus.be.server.global.entity.BaseEntity;
-import lombok.Getter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "concert_schedules")
 public class ConcertScheduleEntity extends BaseEntity {
@@ -26,4 +27,13 @@ public class ConcertScheduleEntity extends BaseEntity {
 
     @Column(nullable = false)
     private LocalDateTime reservationCloseTime;
+
+    @Builder
+    private ConcertScheduleEntity(Long concertId, LocalDateTime date,
+                                   LocalDateTime reservationOpenTime, LocalDateTime reservationCloseTime) {
+        this.concertId = concertId;
+        this.date = date;
+        this.reservationOpenTime = reservationOpenTime;
+        this.reservationCloseTime = reservationCloseTime;
+    }
 }

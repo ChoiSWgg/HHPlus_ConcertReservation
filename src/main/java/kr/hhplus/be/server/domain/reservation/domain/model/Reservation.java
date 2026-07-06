@@ -30,6 +30,13 @@ public class Reservation {
         return reservation;
     }
 
+    // 만료된 예약을 재점유 — 기존 id로 UPDATE하여 unique constraint 위반 방지
+    public static Reservation rehold(Long id, Long userId, Long scheduleId, Long seatId) {
+        Reservation reservation = hold(userId, scheduleId, seatId);
+        reservation.id = id;
+        return reservation;
+    }
+
     // 엔터티 -> 도메인 역매핑용
     public static Reservation reconstruct(Long id, Long userId, Long scheduleId, Long seatId, String status,
                                           LocalDateTime reservedAt, LocalDateTime reservationExpiredAt, LocalDateTime confirmedAt) {

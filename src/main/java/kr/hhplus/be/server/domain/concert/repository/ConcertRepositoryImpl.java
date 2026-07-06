@@ -8,7 +8,7 @@ import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
-public class ConcertJpaRepositoryImpl implements ConcertRepository{
+public class ConcertRepositoryImpl implements ConcertRepository{
 
     private final ConcertJpaRepository concertJpaRepository;
 

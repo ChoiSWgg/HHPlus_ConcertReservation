@@ -8,11 +8,11 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public class ReservationJpaRepositoryImpl implements ReservationRepository {
+public class ReservationRepositoryImpl implements ReservationRepository {
 
     private final ReservationJpaRepository reservationJpaRepository;
 
-    public ReservationJpaRepositoryImpl(ReservationJpaRepository reservationJpaRepository) {
+    public ReservationRepositoryImpl(ReservationJpaRepository reservationJpaRepository) {
         this.reservationJpaRepository = reservationJpaRepository;
     }
 

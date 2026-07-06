@@ -66,4 +66,8 @@ public class QueueService {
         String status = rank < ACTIVE_THRESHOLD ? "ACTIVE" : "WAIT";
         return new QueueTokenResponse(userId, token, status, rank+1); // 1-based rank
     }
+
+    public void removeFromQueue(Long userId) {
+        queueRepository.removeFromQueue(userId);
+    }
 }
