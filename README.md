@@ -4,18 +4,17 @@
 - [API 명세서](./docs/api-specification.md)
 - [데이터 모델링 (ERD)](./docs/erd.md)
 - [인프라 구조 설계](./docs/infra_structure.md)
+- [인덱스 분석 보고서](./docs/index-analysis.md)
+- [통합 테스트 전략](./docs/통합테스트-strategy.md)
 
 ## 🏛️ 주요 의사결정 (ADR 요약)
 1. **[ADR-001] 대기열 관리 방식 결정**: Redis Sorted Set vs RDBMS
-    - *결정*: 대규모 트래픽 시 RDBMS 병목을 방지하고 빠른 순번 조회를 보장하기 위해, 대기열 토큰 관리를 Redis Sorted Set(ZSET) 자료구조를 사용.
+   - *결정*: 대규모 트래픽 시 RDBMS 병목을 방지하고 빠른 순번 조회를 보장하기 위해 Redis Sorted Set(ZSET)을 사용.
+   - *상세*: [ADR-001 전문](./docs/ADR-001-queue-redis.md)
 
-
-2. **[ADR-002] 좌석 임시 배정(Held) 제어 방식**: Redis TTL 기반 관리
-    - *결정*: 5분간의 좌석 선점 시간 보장 및 중복 예약 방지를 위해 Redis 분산 락과 DB 수준의 복합 UNIQUE INDEX를 결합.
-
-
-3. **[ADR-003] 포인트 연산 레이스 컨디션 방어**
-   - *결정*:충전 및 차감 연산 시 무결성을 확보하기 위해 DB 레벨에서 비관적 락(SELECT ... FOR UPDATE)을 활용합니다.
+2. **[ADR-002] 동시성 제어 전략**: DB UNIQUE 제약 + rehold 패턴
+   - *결정*: 동시에 같은 좌석에 요청이 몰릴 때 한 명만 성공하도록 DB UNIQUE(schedule_id, seat_id) 제약을 최종 방어선으로 사용. 만료된 예약 재점유 시 INSERT 대신 UPDATE(rehold)로 처리하여 UNIQUE 위반을 회피.
+   - *상세*: [ADR-002 전문](./docs/ADR-002-concurrency-strategy.md)
 
 ---
 #### Running Docker Containers
