@@ -4,8 +4,9 @@
 - [API 명세서](./docs/api-specification.md)
 - [데이터 모델링 (ERD)](./docs/erd.md)
 - [인프라 구조 설계](./docs/infra_structure.md)
-- [인덱스 분석 보고서](./docs/index-analysis.md)
+- [인덱스 분석 보고서](./docs/인덱스%20분석%20보고서.md)
 - [통합 테스트 전략](./docs/통합테스트-strategy.md)
+- [동시성 분석 보고서](./docs/동시성-분석.md)
 
 ## 🏛️ 주요 의사결정 (ADR 요약)
 1. **[ADR-001] 대기열 관리 방식 결정**: Redis Sorted Set vs RDBMS

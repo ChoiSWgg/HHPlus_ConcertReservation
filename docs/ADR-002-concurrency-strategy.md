@@ -1,3 +1,5 @@
+> 📌 작성 시점: 항해99 HH Plus 4주차 (Section 4)
+
 # ADR-002: 동시성 제어 전략 — DB UNIQUE 제약 + rehold 패턴
 
 ## 상태
