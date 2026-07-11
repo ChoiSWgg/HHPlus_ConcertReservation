@@ -1,6 +1,5 @@
 package kr.hhplus.be.server.integration;
 
-import jakarta.transaction.Transactional;
 import kr.hhplus.be.server.domain.concert.entity.ConcertEntity;
 import kr.hhplus.be.server.domain.concert.entity.ConcertScheduleEntity;
 import kr.hhplus.be.server.domain.concert.entity.SeatEntity;
@@ -8,12 +7,11 @@ import kr.hhplus.be.server.domain.concert.repository.ConcertJpaRepository;
 import kr.hhplus.be.server.domain.concert.repository.ConcertScheduleJpaRepository;
 import kr.hhplus.be.server.domain.concert.repository.SeatJpaRepository;
 import kr.hhplus.be.server.domain.payment.application.PaymentFacade;
-import kr.hhplus.be.server.domain.payment.infrastructure.persistence.PaymentJpaRepository;
 import kr.hhplus.be.server.domain.payment.interfaces.web.dto.PaymentResponse;
-import kr.hhplus.be.server.domain.queue.dto.QueueTokenResponse;
-import kr.hhplus.be.server.domain.queue.repository.QueueRedisRepository;
 import kr.hhplus.be.server.domain.queue.service.QueueService;
-import kr.hhplus.be.server.domain.reservation.application.ReservationService;
+import kr.hhplus.be.server.domain.reservation.application.ReservationFacade;
+import kr.hhplus.be.server.domain.reservation.infrastructure.persistence.ReservationEntity;
+import kr.hhplus.be.server.domain.reservation.infrastructure.persistence.ReservationJpaRepository;
 import kr.hhplus.be.server.domain.reservation.interfaces.web.dto.ReservationResponse;
 import kr.hhplus.be.server.domain.user.entity.UserEntity;
 import kr.hhplus.be.server.domain.user.repository.UserJpaRepository;
@@ -23,15 +21,14 @@ import kr.hhplus.be.server.support.AbstractIntegrationTest;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-
 @Transactional
-@RequiredArgsConstructor
 public class ConcertReservationFlowTest extends AbstractIntegrationTest {
 
     @Autowired private UserJpaRepository userJpaRepository;
@@ -40,12 +37,14 @@ public class ConcertReservationFlowTest extends AbstractIntegrationTest {
     @Autowired private ConcertScheduleJpaRepository concertScheduleJpaRepository;
     @Autowired private SeatJpaRepository seatJpaRepository;
 
+
     @Autowired private QueueService queueService;
-    @Autowired private ReservationService reservationService;
+    @Autowired private ReservationFacade reservationFacade;
     @Autowired private PaymentFacade paymentFacade;
+    @Autowired private ReservationJpaRepository reservationJpaRepository;
 
     @Test
-    void 토큰발급_좌석예약_결제_전체_플로우_성공() {
+    void 전체_플로우_토큰발급_좌석예약_결제_성공() {
 
         // given
         // - 임시 유저 생성 및 DB에 저장
@@ -76,7 +75,7 @@ public class ConcertReservationFlowTest extends AbstractIntegrationTest {
 
         // - 토큰 발급
         queueService.issueToken(user.getId());
-        ReservationResponse reservationResponse = reservationService.holdSeat(
+        ReservationResponse reservationResponse = reservationFacade.holdSeat(
             schedule.getId(), user.getId(), seat.getId()
         );
         // - 결제 및 좌석 예약
@@ -93,6 +92,55 @@ public class ConcertReservationFlowTest extends AbstractIntegrationTest {
         WalletEntity wallet = walletJpaRepository.findByUserId(user.getId()).get();
         assertThat(wallet.getBalance()).isEqualTo(5000L); // 10000L - 5000L
 
+    }
+
+    @Test
+    void 만료된_예약이_있으면_다른_유저가_같은_좌석_예약_성공() {
+
+        // given
+        // - 유저 2명, 콘서트 1개, 콘서트 스케줄 1개, 좌석 1개
+        UserEntity userA = userJpaRepository.save(UserEntity.builder()
+            .name("유저A").email("userA@test.com").password("1234")
+            .build());
+        UserEntity userB = userJpaRepository.save(UserEntity.builder()
+            .name("유저B").email("userB@test.com").password("1234")
+            .build());
+        ConcertEntity concert = concertJpaRepository.save(ConcertEntity.builder()
+                .title("테스트 콘서트").description("테스트를 위한 콘서트")
+            .build());
+        ConcertScheduleEntity schedule = concertScheduleJpaRepository.save(ConcertScheduleEntity.builder()
+            .concertId(concert.getId())
+            .date(LocalDateTime.now().plusDays(30))
+            .reservationOpenTime(LocalDateTime.now().minusDays(1))
+            .reservationCloseTime(LocalDateTime.now().plusDays(29))
+            .build());
+        SeatEntity seat = seatJpaRepository.save(SeatEntity.builder()
+            .seatNo(1)
+            .build());
+
+        // - 유저A는 좌석을 예약 (HELD 상태)
+        queueService.issueToken(userA.getId());
+        reservationFacade.holdSeat(schedule.getId(), userA.getId(), seat.getId());
+
+        // - 유저A의 예약이 만료 시간을 넘었음 / 시간 강제 조작
+        ReservationEntity expiredReservation = reservationJpaRepository
+            .findByScheduleIdAndSeatId(schedule.getId(), seat.getId()).get();
+        ReflectionTestUtils.setField(expiredReservation, "reservationExpiredAt",
+            LocalDateTime.now().minusMinutes(10));
+        reservationJpaRepository.saveAndFlush(expiredReservation);
+
+        // when
+        // - 유저B가 A가 예약중이던 좌석을 예약 시도 -> 예약 성공
+        queueService.issueToken(userB.getId());
+        ReservationResponse result = reservationFacade.holdSeat(
+            schedule.getId(), userB.getId(), seat.getId()
+        );
+
+        // then
+        // - 예약은 HELD 상태임을 검증
+        assertThat(result.getStatus()).isEqualTo("HELD");
+        // - 예약된 좌석 번호 검증
+        assertThat(result.getSeatId()).isEqualTo(seat.getId());
     }
 
 }
