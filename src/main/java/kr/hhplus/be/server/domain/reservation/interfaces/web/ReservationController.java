@@ -1,6 +1,6 @@
 package kr.hhplus.be.server.domain.reservation.interfaces.web;
 
-import kr.hhplus.be.server.domain.reservation.application.ReservationService;
+import kr.hhplus.be.server.domain.reservation.application.ReservationFacade;
 import kr.hhplus.be.server.domain.reservation.interfaces.web.dto.ReservationRequest;
 import kr.hhplus.be.server.domain.reservation.interfaces.web.dto.ReservationResponse;
 import kr.hhplus.be.server.global.response.ApiResponse;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class ReservationController {
 
-    private final ReservationService reservationService;
+    private final ReservationFacade reservationFacade;
 
     // 좌석 임시 배정
     @PostMapping("/schedules/{scheduleId}/reservations")
@@ -28,7 +28,7 @@ public class ReservationController {
             .status(HttpStatus.CREATED)
             .body(
                 ApiResponse.success(
-                    reservationService.holdSeat(scheduleId, request.getUserId(), request.getSeatId())
+                    reservationFacade.holdSeat(scheduleId, request.getUserId(), request.getSeatId())
                 )
             );
     }
