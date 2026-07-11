@@ -8,7 +8,7 @@ import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
-public class SeatJpaRepositoryImpl implements SeatRepository{
+public class SeatRepositoryImpl implements SeatRepository{
 
     private final SeatJpaRepository seatJpaRepository;
 

@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class QueueTokenResponse {
+public class QueueStatusResponse {
     private Long userId;
     private String token;
     private String status;

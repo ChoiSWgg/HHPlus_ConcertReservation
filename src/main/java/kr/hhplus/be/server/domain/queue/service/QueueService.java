@@ -1,6 +1,6 @@
 package kr.hhplus.be.server.domain.queue.service;
 
-import kr.hhplus.be.server.domain.queue.dto.QueueTokenResponse;
+import kr.hhplus.be.server.domain.queue.dto.QueueStatusResponse;
 import kr.hhplus.be.server.domain.queue.repository.QueueRepository;
 import kr.hhplus.be.server.domain.user.repository.UserRepository;
 import kr.hhplus.be.server.global.exception.CustomException;
@@ -33,18 +33,19 @@ public class QueueService {
      * 4. queueRepository.storeToken(userId, token) 으로 토큰 저장
      * 5. queueRepository.addToQueue(userId) 로 ZSET에 추가, 0-based rank 반환
      * 6. rank < ACTIVE_THRESHOLD → status = "ACTIVE", 아니면 "WAIT"
-     * 7. QueueTokenResponse(userId, token, status, rank + 1) 반환
+     * 7. QueueStatusResponse(userId, token, status, rank + 1) 반환
      */
-    public QueueTokenResponse issueToken(Long userId) {
+    public QueueStatusResponse issueToken(Long userId) {
         userRepository.findById(userId)
             .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         if (queueRepository.isUserInQueue(userId))
             throw new CustomException(ErrorCode.ALREADY_IN_QUEUE);
+
         String token = UUID.randomUUID().toString();
         Long rank = queueRepository.addToQueue(userId);
         queueRepository.storeToken(userId, token);
         String status = rank < ACTIVE_THRESHOLD ? "ACTIVE" : "WAIT";
-        return new QueueTokenResponse(userId, token, status, rank + 1);
+        return new QueueStatusResponse(userId, token, status, rank + 1);
     }
 
     /**
@@ -55,15 +56,19 @@ public class QueueService {
      * 2. queueRepository.getRank(userId) 로 현재 0-based rank 조회
      * 3. queueRepository.getToken(userId) 로 토큰 조회
      * 4. rank < ACTIVE_THRESHOLD → status = "ACTIVE", 아니면 "WAIT"
-     * 5. QueueTokenResponse(userId, token, status, rank + 1) 반환
+     * 5. QueueStatusResponse(userId, token, status, rank + 1) 반환
      */
-    public QueueTokenResponse getQueueStatus(Long userId) {
+    public QueueStatusResponse getQueueStatus(Long userId) {
         if (!queueRepository.isUserInQueue(userId))
             throw new CustomException(ErrorCode.USER_NOT_IN_QUEUE);
         Long rank = queueRepository.getRank(userId);
         if (rank == null) throw new CustomException(ErrorCode.USER_NOT_IN_QUEUE);
         String token = queueRepository.getToken(userId);
         String status = rank < ACTIVE_THRESHOLD ? "ACTIVE" : "WAIT";
-        return new QueueTokenResponse(userId, token, status, rank+1); // 1-based rank
+        return new QueueStatusResponse(userId, token, status, rank+1); // 1-based rank
+    }
+
+    public void removeFromQueue(Long userId) {
+        queueRepository.removeFromQueue(userId);
     }
 }

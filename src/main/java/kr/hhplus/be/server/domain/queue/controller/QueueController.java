@@ -1,7 +1,7 @@
 package kr.hhplus.be.server.domain.queue.controller;
 
 import kr.hhplus.be.server.domain.queue.dto.QueueTokenRequest;
-import kr.hhplus.be.server.domain.queue.dto.QueueTokenResponse;
+import kr.hhplus.be.server.domain.queue.dto.QueueStatusResponse;
 import kr.hhplus.be.server.domain.queue.service.QueueService;
 import kr.hhplus.be.server.global.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
@@ -18,20 +18,20 @@ public class QueueController {
 
     // 대기열 토큰 발급
     @PostMapping
-    public ResponseEntity<ApiResponse<QueueTokenResponse>> issueToken(
+    public ResponseEntity<ApiResponse<QueueStatusResponse>> issueToken(
         @RequestBody QueueTokenRequest request
     ) {
-        QueueTokenResponse response = queueService.issueToken(request.getUserId());
+        QueueStatusResponse response = queueService.issueToken(request.getUserId());
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(ApiResponse.success(response));
     }
 
     // 대기번호 조회
     @GetMapping("/{userId}")
-    public ResponseEntity<ApiResponse<QueueTokenResponse>> getQueueStatus(
+    public ResponseEntity<ApiResponse<QueueStatusResponse>> getQueueStatus(
         @PathVariable Long userId
     ) {
-        QueueTokenResponse response = queueService.getQueueStatus(userId);
+        QueueStatusResponse response = queueService.getQueueStatus(userId);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 }

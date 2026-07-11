@@ -51,7 +51,8 @@ public enum ErrorCode {
     // 6 유저 대기열 관련
     ALREADY_IN_QUEUE(HttpStatus.CONFLICT, "ALREADY_IN_QUEUE", "이미 대기열에 등록된 사용자입니다."),
     USER_NOT_IN_QUEUE(HttpStatus.NOT_FOUND, "USER_NOT_IN_QUEUE", "대기열에 등록되지 않은 사용자입니다."),
-    TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, "TOKEN_NOT_FOUND", "해당 사용자의 토큰을 찾을 수 없거나 만료되었습니다.");
+    TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, "TOKEN_NOT_FOUND", "해당 사용자의 토큰을 찾을 수 없거나 만료되었습니다."),
+    QUEUE_NOT_ACTIVE(HttpStatus.FORBIDDEN, "QUEUE_NOT_ACTIVE", "대기열 순번이 아직 활성화되지 않았습니다.");
 
     private final HttpStatus status;
     private final String code;

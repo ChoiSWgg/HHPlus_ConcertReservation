@@ -1,6 +1,6 @@
 package kr.hhplus.be.server.domain.queue.service;
 
-import kr.hhplus.be.server.domain.queue.dto.QueueTokenResponse;
+import kr.hhplus.be.server.domain.queue.dto.QueueStatusResponse;
 import kr.hhplus.be.server.domain.queue.repository.QueueRepository;
 import kr.hhplus.be.server.domain.user.entity.UserEntity;
 import kr.hhplus.be.server.domain.user.repository.UserRepository;
@@ -57,7 +57,7 @@ class QueueServiceTest {
             given(queueRepository.isUserInQueue(1L)).willReturn(false);
             given(queueRepository.addToQueue(1L)).willReturn(0L);
 
-            QueueTokenResponse result = queueService.issueToken(1L);
+            QueueStatusResponse result = queueService.issueToken(1L);
 
             assertThat(result.getStatus()).isEqualTo("ACTIVE");
             assertThat(result.getWaitingOrder()).isEqualTo(1L);
@@ -69,7 +69,7 @@ class QueueServiceTest {
             given(queueRepository.isUserInQueue(1L)).willReturn(false);
             given(queueRepository.addToQueue(1L)).willReturn(100L);
 
-            QueueTokenResponse result = queueService.issueToken(1L);
+            QueueStatusResponse result = queueService.issueToken(1L);
 
             assertThat(result.getStatus()).isEqualTo("WAIT");
         }
@@ -89,12 +89,12 @@ class QueueServiceTest {
         }
 
         @Test
-        void 정상_조회시_QueueTokenResponse_반환() {
+        void 정상_조회시_QueueStatusResponse_반환() {
             given(queueRepository.isUserInQueue(1L)).willReturn(true);
             given(queueRepository.getRank(1L)).willReturn(5L);
             given(queueRepository.getToken(1L)).willReturn("token-uuid");
 
-            QueueTokenResponse result = queueService.getQueueStatus(1L);
+            QueueStatusResponse result = queueService.getQueueStatus(1L);
 
             assertThat(result.getStatus()).isEqualTo("ACTIVE");
             assertThat(result.getWaitingOrder()).isEqualTo(6L);

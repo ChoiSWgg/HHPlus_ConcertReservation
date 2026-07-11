@@ -1,6 +1,6 @@
 package kr.hhplus.be.server.domain.payment.interfaces.web;
 
-import kr.hhplus.be.server.domain.payment.application.PaymentService;
+import kr.hhplus.be.server.domain.payment.application.PaymentFacade;
 import kr.hhplus.be.server.domain.payment.interfaces.web.dto.PaymentRequest;
 import kr.hhplus.be.server.domain.payment.interfaces.web.dto.PaymentResponse;
 import kr.hhplus.be.server.global.response.ApiResponse;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class PaymentController {
 
-    private final PaymentService paymentService;
+    private final PaymentFacade paymentFacade;
 
     // 결제요청
     @PostMapping("/reservations/{reservationId}/payments")
@@ -27,7 +27,7 @@ public class PaymentController {
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(
                 ApiResponse.success(
-                    paymentService.processPayment(reservationId, request.getAmount())
+                    paymentFacade.processPayment(reservationId, request.getUserId(), request.getAmount())
                 )
             );
     }

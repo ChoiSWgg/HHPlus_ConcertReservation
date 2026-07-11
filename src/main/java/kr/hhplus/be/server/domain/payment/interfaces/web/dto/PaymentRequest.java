@@ -6,5 +6,6 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class PaymentRequest {
+    private Long userId;
     private Long amount;
 }

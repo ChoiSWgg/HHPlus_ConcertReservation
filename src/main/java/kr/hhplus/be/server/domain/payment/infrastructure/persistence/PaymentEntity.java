@@ -3,11 +3,14 @@ package kr.hhplus.be.server.domain.payment.infrastructure.persistence;
 import jakarta.persistence.*;
 import kr.hhplus.be.server.domain.payment.domain.model.Payment;
 import kr.hhplus.be.server.global.entity.BaseEntity;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "payments")
 public class PaymentEntity extends BaseEntity {

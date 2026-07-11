@@ -2,9 +2,10 @@ package kr.hhplus.be.server.domain.wallet.entity;
 
 import jakarta.persistence.*;
 import kr.hhplus.be.server.global.entity.BaseEntity;
-import lombok.Getter;
+import lombok.*;
 
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "wallets")
 public class WalletEntity extends BaseEntity {
@@ -17,6 +18,14 @@ public class WalletEntity extends BaseEntity {
 
     @Column(nullable = false)
     private Long balance;
+
+    // id는 @GeneratedValue 없으므로 빌더에 포함
+    @Builder
+    private WalletEntity(Long id, Long userId, Long balance) {
+        this.id = id;
+        this.userId = userId;
+        this.balance = balance;
+    }
 
     // 포인트 충전
     public void charge(Long amount) {

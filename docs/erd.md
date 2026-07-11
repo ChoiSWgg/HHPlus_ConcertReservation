@@ -90,7 +90,7 @@ CREATE TABLE `seats` (
 ```sql
 CREATE TABLE `payments` (
   `id` BIGINT PRIMARY KEY,
-  `reservations_id` BIGINT,
+  `reservation_id` BIGINT,
   `price` INT,
   `paid_at` DATETIME
 );
@@ -136,6 +136,6 @@ ALTER TABLE `reservations` ADD FOREIGN KEY (`seat_id`) REFERENCES `seats` (`id`)
 
 ALTER TABLE `wallets` ADD FOREIGN KEY (`id`) REFERENCES `users` (`id`);
 
-ALTER TABLE `payments` ADD FOREIGN KEY (`reservations_id`) REFERENCES `reservations` (`id`);
+ALTER TABLE `payments` ADD FOREIGN KEY (`reservation_id`) REFERENCES `reservations` (`id`);
 
 ```
